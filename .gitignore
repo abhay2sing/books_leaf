@@ -2,4 +2,4 @@ __pycache__/
 .venv/
 support_requests.db*
 author_auth.db*
-node_modules/
+node_modules/ 
