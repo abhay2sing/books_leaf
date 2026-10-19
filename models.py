@@ -1,5 +1,22 @@
+from enum import Enum
+
 from sqlalchemy import ForeignKey, Integer, LargeBinary, MetaData, Text, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+
+class Category(str, Enum):
+    NONE = "none"
+    ROYALTY_PAYMENT = "royalty & payment"
+    ISBN_METADATA = "isbn & metadata"
+    PRINTING_QUALITY = "printing & quality"
+    DISTRIBUTION_AVAILABILITY = "distribution & availability"
+
+
+class Priority(str, Enum):
+    NONE = "none"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
 
 
 class Base(DeclarativeBase):

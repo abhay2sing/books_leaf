@@ -3,4 +3,5 @@ __pycache__/
 support_requests.db*
 author_auth.db*
 node_modules/
-.env/ 
+.env
+.env/

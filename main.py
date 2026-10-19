@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv
-from enum import Enum
 import secrets
 import sqlite3
 import uuid
@@ -10,6 +9,7 @@ from pydantic import BaseModel, Field
 from typing import List
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
+from models import Category, Priority
 #from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -128,19 +128,6 @@ app.add_middleware(
 )
 
 
-class Category(str, Enum):
-    ROYALTY_PAYMENT = "royalty & payment"
-    ISBN_METADATA = "isbn & metadata"
-    PRINTING_QUALITY = "printing & quality"
-    DISTRIBUTION_AVAILABILITY = "distribution & availability"
-
-
-class Priority(str, Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-
-
 class TextClassification(BaseModel):
     category: Category = Field(
         description="The primary category of the plain text context."
@@ -189,6 +176,7 @@ prompt_template = ChatPromptTemplate.from_messages([
     (
         "system",
         "Classify the support request using the available categories and priorities. "
+        "Use 'none' for category or priority when it cannot be determined or does not apply. "
         "Use this Bookleaf policy as context:\n" + sample_context,
     ),
     (
