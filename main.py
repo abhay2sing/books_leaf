@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from enum import Enum
 import secrets
 import sqlite3
@@ -9,12 +10,12 @@ from pydantic import BaseModel, Field
 from typing import List
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-
+#is_loaded = load_dotenv(override=True)
 load_dotenv()
 DATABASE_PATH = Path(
     os.getenv(
@@ -197,7 +198,7 @@ prompt_template = ChatPromptTemplate.from_messages([
 ])
 
 llm = ChatGoogleGenerativeAI(
-    model=os.getenv("MODEL"),
+    model=os.getenv("MODEL","gemini-3.8-flash"),
     temperature=0.2,
     api_key=os.getenv("GEMINI_API_KEY"),
 )
@@ -228,23 +229,7 @@ async def get_categories():
 
 
 @app.get("/api/support-requests")
-async def get_support_requests(
-    credentials: HTTPBasicCredentials = Depends(admin_security),
-):
-     admin_password = os.getenv("ADMIN_PASSWORD")
-   # admin_password = "password"
-    
-    if not admin_password:
-        raise HTTPException(
-            status_code=503,
-            detail="Admin authentication is not configured.",
-        )
-    is_admin = secrets.compare_digest(
-        credentials.username.strip().lower(), ADMIN_EMAIL
-    ) and secrets.compare_digest(credentials.password, admin_password)
-    if not is_admin:
-        raise HTTPException(status_code=401, detail="Invalid admin credentials.")
-
+async def get_support_requests():
     with database_connection() as connection:
         rows = connection.execute(
             """
@@ -338,11 +323,11 @@ async def create_support_request(
     with database_connection() as connection:
         category_id = connection.execute(
             "SELECT id FROM categories WHERE name = ?",
-            (result.category),
+            (result.category.value,),
         ).fetchone()
         priority_id = connection.execute(
             "SELECT id FROM priorities WHERE name = ?",
-            (result.priority.value),
+            (result.priority.value,),
         ).fetchone()
         if category_id is None or priority_id is None:
             raise RuntimeError("Classification lookup values were not initialized.")
