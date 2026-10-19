@@ -197,7 +197,7 @@ prompt_template = ChatPromptTemplate.from_messages([
 ])
 
 llm = ChatGoogleGenerativeAI(
-    model="gemini-3.8-flash",
+    model=os.getenv("MODEL"),
     temperature=0.2,
     api_key=os.getenv("GEMINI_API_KEY"),
 )
@@ -231,8 +231,8 @@ async def get_categories():
 async def get_support_requests(
     credentials: HTTPBasicCredentials = Depends(admin_security),
 ):
-    # admin_password = os.getenv("ADMIN_PASSWORD")
-    admin_password = "password"
+     admin_password = os.getenv("ADMIN_PASSWORD")
+   # admin_password = "password"
     
     if not admin_password:
         raise HTTPException(
